@@ -34,6 +34,16 @@ SOFTWARE.*/
 extern "C" {
 #endif
 
+static void transpose(int n, double* A)
+{
+	for (int i=0;i<n;i++)
+		for (int j=i+1;j<n;j++)
+		{
+			double temp = A[i * n + j];
+			A[i * n + j] = A[j * n + i];
+			A[j * n + i] = temp;
+		}
+}
 
 static PyObject* error(PyObject* type, const char* msg)
 {
@@ -69,8 +79,12 @@ static PyObject* symmetrize_lattice(PyObject* self, PyObject* args, PyObject* kw
 	if (B == NULL)
 		return NULL;
 
+	double BT[9], optT[9];
+	memcpy(BT, B, 9 * sizeof(double));
+	transpose(3, BT);
+
 	double strain = INFINITY, opt[9] = {0};
-	int ret = optimize(name, B, search_correspondences, opt, &strain);
+	int ret = optimize(name, BT, search_correspondences, optT, &strain);
 	if (ret != 0)
 	{
 		if (ret == INVALID_BRAVAIS_TYPE)
@@ -81,6 +95,8 @@ static PyObject* symmetrize_lattice(PyObject* self, PyObject* args, PyObject* kw
 
 	npy_intp dim[2] = {3, 3};
 	PyObject* arr_opt = PyArray_SimpleNew(2, dim, NPY_DOUBLE);
+	memcpy(opt, optT, 9 * sizeof(double));
+	transpose(3, opt);
 	memcpy(PyArray_DATA((PyArrayObject*)arr_opt), opt, 9 * sizeof(double));
 
 	PyObject* result = Py_BuildValue("dO", strain, arr_opt);
@@ -167,7 +183,36 @@ PyMODINIT_FUNC PyInit_auguste(void)
 {
 	Py_Initialize();
 	import_array();
-	return PyModule_Create(&auguste_definition);
+
+	PyObject* module = PyModule_Create(&auguste_definition);
+	if (module == NULL)
+		goto except;
+
+	//Adding module globals
+	if (PyModule_AddObject(	module, "names",
+				Py_BuildValue("ssssssssssssss",
+						"primitive triclinic",
+						"primitive monoclinic",
+						"base-centred monoclinic",
+						"primitive orthorhombic",
+						"base-centred orthorhombic",
+						"body-centred orthorhombic",
+						"face-centred orthorhombic",
+						"primitive tetragonal",
+						"body-centred tetragonal",
+						"primitive rhombohedral",
+						"primitive hexagonal",
+						"primitive cubic",
+						"body-centred cubic",
+						"face-centred cubic")))
+		goto except;
+	goto finally;
+
+except:
+	Py_XDECREF(module);
+	module = NULL;
+finally:
+	return module;
 }
 
 #ifdef __cplusplus
