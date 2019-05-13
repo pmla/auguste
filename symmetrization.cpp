@@ -28,12 +28,10 @@ SOFTWARE.*/
 #include <cassert>
 #include <unordered_set>
 #include <vector>
-#include "lup.h"
 #include "mahalonobis_transform.h"
 #include "matrix_vector.h"
 #include "minkowski_reduction.h"
-#include "polar.h"
-#include "quat.h"
+#include "quaternion.h"
 #include "sqp_newton_lagrange.h"
 #include "stepwise_iteration.h"
 #include "unimodular_neighbourhood.h"

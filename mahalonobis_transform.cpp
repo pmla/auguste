@@ -25,7 +25,7 @@ SOFTWARE.*/
 #include <cmath>
 #include "matrix_vector.h"
 #include "eigendecomposition.h"
-#include "lup.h"
+#include "lup_decomposition.h"
 
 
 static void compute_matrix_inverse_product(int n, double* LU, int* pivot, double* A, double* C)

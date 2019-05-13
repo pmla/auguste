@@ -25,9 +25,9 @@ SOFTWARE.*/
 #include <cstdio>
 #include <cmath>
 #include <cstring>
-#include "lup.h"
+#include "lup_decomposition.h"
 #include "matrix_vector.h"
-#include "quat.h"
+#include "quaternion.h"
 
 
 #define HESSIAN(a,b) hessian[(a) * (6 + n) + b]

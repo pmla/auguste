@@ -24,7 +24,7 @@ SOFTWARE.*/
 #include <cmath>
 #include <cstring>
 #include "matrix_vector.h"
-#include "polar.h"
+#include "polar_decomposition.h"
 
 
 double calculate_trace(int n, double* x, double* Ktrans, double* Q, double* P)
