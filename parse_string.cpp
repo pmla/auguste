@@ -47,6 +47,7 @@ int parse_string(char* name)
 		{"base-centred monoclinic", BASEMONOCLINIC},
 		{"base-centered monoclinic", BASEMONOCLINIC},
 		{"mS", BASEMONOCLINIC},
+		{"mC", BASEMONOCLINIC},
 
 		{"orthorhombic", ORTHORHOMBIC},
 		{"primitive orthorhombic", ORTHORHOMBIC},
@@ -55,6 +56,7 @@ int parse_string(char* name)
 		{"base-centred orthorhombic", BASECO},
 		{"base-centered orthorhombic", BASECO},
 		{"oS", BASECO},
+		{"oC", BASECO},
 
 		{"body-centred orthorhombic", BCO},
 		{"body-centered orthorhombic", BCO},

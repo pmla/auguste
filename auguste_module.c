@@ -105,6 +105,64 @@ static PyObject* symmetrize_lattice(PyObject* self, PyObject* args, PyObject* kw
 	return result;
 }
 
+static PyObject* calculate_vector(PyObject* self, PyObject* args, PyObject* kwargs)
+{
+	(void)self;
+
+	PyObject* obj_B = NULL;
+	static const char *kwlist[] = {	(const char*)"lattice_basis", NULL};
+	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O", (char**)kwlist, &obj_B))
+		return NULL;
+
+	PyObject* obj_Bcont = PyArray_ContiguousFromAny(obj_B, NPY_DOUBLE, 1, 3);
+	if (obj_Bcont == NULL)
+		return error(PyExc_TypeError, "Invalid input data: B");
+
+	if (PyArray_NDIM(obj_Bcont) != 2			//two-dimensional
+		|| PyArray_DIM(obj_Bcont, 0) != 3		//first dim is 3
+		|| PyArray_DIM(obj_Bcont, 1) != 3)		//second dim is 3
+		return error(PyExc_TypeError, "Input must have dimensions 3x3: B");
+
+	double* B = (double*)PyArray_DATA(obj_Bcont);
+	if (B == NULL)
+		return NULL;
+
+	double BT[9];
+	memcpy(BT, B, 9 * sizeof(double));
+	transpose(3, BT);
+
+	#define NUM_TYPES 14
+	double strains[NUM_TYPES] = {	INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY,
+					INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY};
+
+	char* pearson[NUM_TYPES] = {	"aP", "mP", "mS", "oP", "oS", "oF", "oI",
+					"tP", "tI", "hP", "hR", "cP", "cF", "cI"};
+
+	for (int i=0;i<NUM_TYPES;i++)
+	{
+		double strain = 0;
+		double dummy_opt[9] = {0};
+
+		int ret = optimize(pearson[i], BT, true, dummy_opt, &strain);
+		if (ret != 0)
+		{
+			if (ret == INVALID_BRAVAIS_TYPE)
+				return error(PyExc_TypeError, "unrecognized bravais_type");
+			else
+				return error(PyExc_TypeError, "symmetrization failed");
+		}
+
+		strains[i] = strain;
+	}
+
+	npy_intp dim[1] = {NUM_TYPES};
+	PyObject* arr_strains = PyArray_SimpleNew(1, dim, NPY_DOUBLE);
+	memcpy(PyArray_DATA((PyArrayObject*)arr_strains), strains, NUM_TYPES * sizeof(double));
+
+	Py_DECREF(obj_Bcont);
+	return arr_strains;
+}
+
 static PyObject* minkowski_reduce(PyObject* self, PyObject* args)
 {
 	(void)self;
@@ -157,6 +215,12 @@ static PyMethodDef auguste_methods[] = {
 		(PyCFunction)symmetrize_lattice,
 		METH_VARARGS | METH_KEYWORDS,
 		"Symmetrize a Bravais lattice."
+	},
+	{
+		"calculate_vector",
+		(PyCFunction)calculate_vector,
+		METH_VARARGS | METH_KEYWORDS,
+		"Calculate a vector of distances (strains) from all Bravais lattice types."
 	},
 	{
 		"minkowski_reduce",
