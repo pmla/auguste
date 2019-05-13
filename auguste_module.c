@@ -34,6 +34,12 @@ SOFTWARE.*/
 extern "C" {
 #endif
 
+static PyObject* error(PyObject* type, const char* msg)
+{
+	PyErr_SetString(type, msg);
+	return NULL;
+}
+
 static void transpose(int n, double* A)
 {
 	for (int i=0;i<n;i++)
@@ -45,10 +51,34 @@ static void transpose(int n, double* A)
 		}
 }
 
-static PyObject* error(PyObject* type, const char* msg)
+static bool get_unit_cell(PyObject* obj_B, double* BT)
 {
-	PyErr_SetString(type, msg);
-	return NULL;
+	PyObject* obj_Bcont = PyArray_ContiguousFromAny(obj_B, NPY_DOUBLE, 1, 3);
+	if (obj_Bcont == NULL)
+		return error(PyExc_TypeError, "Invalid input data: B");
+
+	if (PyArray_NDIM(obj_Bcont) != 2			//two-dimensional
+		|| PyArray_DIM(obj_Bcont, 0) != 3		//first dim is 3
+		|| PyArray_DIM(obj_Bcont, 1) != 3)		//second dim is 3
+	{
+		error(PyExc_TypeError, "Input must have dimensions 3x3: B");
+		Py_DECREF(obj_Bcont);
+		return false;
+	}
+
+	double* B = (double*)PyArray_DATA(obj_Bcont);
+	if (B == NULL)
+	{
+		error(PyExc_TypeError, "Invalid cell matrix");
+		Py_DECREF(obj_Bcont);
+		return false;
+	}
+
+	memcpy(BT, B, 9 * sizeof(double));
+	transpose(3, BT);
+
+	Py_DECREF(obj_Bcont);
+	return true;
 }
 
 static PyObject* symmetrize_lattice(PyObject* self, PyObject* args, PyObject* kwargs)
@@ -66,24 +96,11 @@ static PyObject* symmetrize_lattice(PyObject* self, PyObject* args, PyObject* kw
 	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "Os|p", (char**)kwlist, &obj_B, &name, &search_correspondences))
 		return NULL;
 
-	PyObject* obj_Bcont = PyArray_ContiguousFromAny(obj_B, NPY_DOUBLE, 1, 3);
-	if (obj_Bcont == NULL)
-		return error(PyExc_TypeError, "Invalid input data: B");
-
-	if (PyArray_NDIM(obj_Bcont) != 2			//two-dimensional
-		|| PyArray_DIM(obj_Bcont, 0) != 3		//first dim is 3
-		|| PyArray_DIM(obj_Bcont, 1) != 3)		//second dim is 3
-		return error(PyExc_TypeError, "Input must have dimensions 3x3: B");
-
-	double* B = (double*)PyArray_DATA(obj_Bcont);
-	if (B == NULL)
+	double BT[9] = {0};
+	if (!get_unit_cell(obj_B, BT))
 		return NULL;
 
-	double BT[9], optT[9];
-	memcpy(BT, B, 9 * sizeof(double));
-	transpose(3, BT);
-
-	double strain = INFINITY, opt[9] = {0};
+	double strain = INFINITY, optT[9] = {0};
 	int ret = optimize(name, BT, search_correspondences, optT, &strain);
 	if (ret != 0)
 	{
@@ -95,13 +112,13 @@ static PyObject* symmetrize_lattice(PyObject* self, PyObject* args, PyObject* kw
 
 	npy_intp dim[2] = {3, 3};
 	PyObject* arr_opt = PyArray_SimpleNew(2, dim, NPY_DOUBLE);
+	double opt[9];
 	memcpy(opt, optT, 9 * sizeof(double));
 	transpose(3, opt);
 	memcpy(PyArray_DATA((PyArrayObject*)arr_opt), opt, 9 * sizeof(double));
 
 	PyObject* result = Py_BuildValue("dO", strain, arr_opt);
 	Py_DECREF(arr_opt);
-	Py_DECREF(obj_Bcont);
 	return result;
 }
 
@@ -114,22 +131,9 @@ static PyObject* calculate_vector(PyObject* self, PyObject* args, PyObject* kwar
 	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O", (char**)kwlist, &obj_B))
 		return NULL;
 
-	PyObject* obj_Bcont = PyArray_ContiguousFromAny(obj_B, NPY_DOUBLE, 1, 3);
-	if (obj_Bcont == NULL)
-		return error(PyExc_TypeError, "Invalid input data: B");
-
-	if (PyArray_NDIM(obj_Bcont) != 2			//two-dimensional
-		|| PyArray_DIM(obj_Bcont, 0) != 3		//first dim is 3
-		|| PyArray_DIM(obj_Bcont, 1) != 3)		//second dim is 3
-		return error(PyExc_TypeError, "Input must have dimensions 3x3: B");
-
-	double* B = (double*)PyArray_DATA(obj_Bcont);
-	if (B == NULL)
+	double BT[9] = {0};
+	if (!get_unit_cell(obj_B, BT))
 		return NULL;
-
-	double BT[9];
-	memcpy(BT, B, 9 * sizeof(double));
-	transpose(3, BT);
 
 	#define NUM_TYPES 14
 	double strains[NUM_TYPES] = {	INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY,
@@ -158,11 +162,10 @@ static PyObject* calculate_vector(PyObject* self, PyObject* args, PyObject* kwar
 	npy_intp dim[1] = {NUM_TYPES};
 	PyObject* arr_strains = PyArray_SimpleNew(1, dim, NPY_DOUBLE);
 	memcpy(PyArray_DATA((PyArrayObject*)arr_strains), strains, NUM_TYPES * sizeof(double));
-
-	Py_DECREF(obj_Bcont);
 	return arr_strains;
 }
 
+/*
 static PyObject* minkowski_reduce(PyObject* self, PyObject* args)
 {
 	(void)self;
@@ -172,23 +175,13 @@ static PyObject* minkowski_reduce(PyObject* self, PyObject* args)
 	if (!PyArg_ParseTuple(args, "O", &obj_B))
 		return NULL;
 
-	PyObject* obj_Bcont = PyArray_ContiguousFromAny(obj_B, NPY_DOUBLE, 1, 3);
-	if (obj_Bcont == NULL)
-		return error(PyExc_TypeError, "Invalid input data: B");
-
-	assert (PyArray_TYPE(obj_Bcont) == NPY_DOUBLE);
-	if (PyArray_NDIM(obj_Bcont) != 2			//two-dimensional
-		|| PyArray_DIM(obj_Bcont, 0) != 3		//first dim is 3
-		|| PyArray_DIM(obj_Bcont, 1) != 3)		//second dim is 3
-		return error(PyExc_TypeError, "Input must have dimensions 3x3: B");
-
-	double* B = (double*)PyArray_DATA(obj_Bcont);
-	if (B == NULL)
+	double BT[9] = {0};
+	if (!get_unit_cell(obj_B, BT))
 		return NULL;
 
 	double R[9] = {0};
 	int path[9] = {0};
-	int ret = minkowski_basis((double (*)[3])B, (double (*)[3])R, (int (*)[3])path);
+	int ret = minkowski_basis((double (*)[3])BT, (double (*)[3])R, (int (*)[3])path);
 
 	npy_intp dim[2] = {3, 3};
 	PyObject* arr_R = PyArray_SimpleNew(2, dim, NPY_DOUBLE);
@@ -205,9 +198,9 @@ static PyObject* minkowski_reduce(PyObject* self, PyObject* args)
 
 	Py_DECREF(arr_R);
 	Py_DECREF(arr_path);
-	Py_DECREF(obj_Bcont);
 	return result;
 }
+*/
 
 static PyMethodDef auguste_methods[] = {
 	{
@@ -222,12 +215,12 @@ static PyMethodDef auguste_methods[] = {
 		METH_VARARGS | METH_KEYWORDS,
 		"Calculate a vector of distances (strains) from all Bravais lattice types."
 	},
-	{
-		"minkowski_reduce",
-		minkowski_reduce,
-		METH_VARARGS,
-		"Minkowski-reduce a Bravais lattice basis."
-	},
+	//{
+	//	"minkowski_reduce",
+	//	minkowski_reduce,
+	//	METH_VARARGS,
+	//	"Minkowski-reduce a Bravais lattice basis."
+	//},
 	{NULL, NULL, 0, NULL}
 };
 
