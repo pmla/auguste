@@ -5,40 +5,32 @@ A python module for minimum-strain symmetrization of Bravais lattices.  Symmetri
 
 ### Installation:
 
-To build the module:
+To install the module with pip (recommended):
+```
+pip install --user git+https://github.com/pmla/auguste
+```
+
+To do a manual build and installation:
 ```
 python3 setup.py build
-```
-
-To install the module locally (recommended):
-```
 python3 setup.py install --user
 ```
-
-To install the module globally:
-```
-python3 setup.py install
-```
-
 
 ### Usage:
 To import the module:
 ```
-import auguste
+>>> import auguste
 ```
 
 To symmetrize a lattice (with rows as unit vectors):
 ```
-d, ptetcell = auguste.symmetrize_lattice(cell, "primitive tetragonal")
+>>> d, symcell = auguste.symmetrize_lattice(cell, "primitive tetragonal")
 ```
 
-The lattice names can be chosen from:
+Supported lattice names are stored in the module variable:
 ```
+>>> auguste.names
 ('primitive triclinic', 'primitive monoclinic', 'base-centred monoclinic', 'primitive orthorhombic', 'base-centred orthorhombic', 'body-centred orthorhombic', 'face-centred orthorhombic', 'primitive tetragonal', 'body-centred tetragonal', 'primitive rhombohedral', 'primitive hexagonal', 'primitive cubic', 'body-centred cubic', 'face-centred cubic')
-```
-These are stored in the variable:
-```
-auguste.names
 ```
 Pearson symbols are also supported:
 ```
@@ -46,8 +38,8 @@ Pearson symbols are also supported:
 ```
 To calculate the distances from all Bravais types:
 ```
-distances = auguste.calculate_vector(cell)
+>>> distances = auguste.calculate_vector(cell)
 ```
 
 ### Information
-auguste is written by P. M. Larsen.  The software is provided under the MIT license.  A manuscript describing the method is in preparation.
+`auguste` is written by P. M. Larsen.  The software is provided under the MIT license.  A manuscript describing the method is in preparation.
