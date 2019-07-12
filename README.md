@@ -24,21 +24,30 @@ To import the module:
 
 To symmetrize a lattice (with rows as unit vectors):
 ```
+>>> cell = [[0, 1, 1], [1, 0, 1], [1, 1, 0]]
 >>> d, symcell = auguste.symmetrize_lattice(cell, "primitive tetragonal")
+>>> d
+0.4714045207910317
+>>> symcell
+array([[-0.37037037,  0.74074074,  0.74074074],
+       [ 0.74074074, -0.37037037,  0.74074074],
+       [ 0.74074074,  0.74074074, -0.37037037]])
 ```
 
 Supported lattice names are stored in the module variable:
 ```
 >>> auguste.names
 ('primitive triclinic', 'primitive monoclinic', 'base-centred monoclinic', 'primitive orthorhombic', 'base-centred orthorhombic', 'body-centred orthorhombic', 'face-centred orthorhombic', 'primitive tetragonal', 'body-centred tetragonal', 'primitive rhombohedral', 'primitive hexagonal', 'primitive cubic', 'body-centred cubic', 'face-centred cubic')
-```
-Pearson symbols are also supported:
-```
-["aP", "mP", "mS", "oP", "oS", "oF", "oI", "tP", "tI", "hP", "hR", "cP", "cF", "cI"]
+>>> auguste.pearson
+('aP', 'mP', 'mS', 'oP', 'oS', 'oF', 'oI', 'tP', 'tI', 'hP', 'hR', 'cP', 'cF', 'cI')
 ```
 To calculate the distances from all Bravais types:
 ```
->>> distances = auguste.calculate_vector(cell)
+>>> auguste.calculate_vector(cell)
+array([0.00000000e+00, 4.28372991e-01, 5.24426159e-16, 4.71404521e-01,
+       4.28372991e-01, 3.80565279e-16, 1.92296269e-16, 4.71404521e-01,
+       4.07921987e-16, 1.92296269e-16, 4.60895951e-01, 4.71404521e-01,
+       2.61971659e-01, 0.00000000e+00])
 ```
 
 ### Information

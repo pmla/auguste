@@ -263,6 +263,12 @@ PyMODINIT_FUNC PyInit_auguste(void)
 						"body-centred cubic",
 						"face-centred cubic")))
 		goto except;
+
+	if (PyModule_AddObject(	module, "pearson",
+				Py_BuildValue("ssssssssssssss",
+						"aP", "mP", "mS", "oP", "oS", "oF", "oI",
+						"tP", "tI", "hP", "hR", "cP", "cF", "cI")))
+		goto except;
 	goto finally;
 
 except:
