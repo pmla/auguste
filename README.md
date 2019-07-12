@@ -34,7 +34,7 @@ array([[-0.37037037,  0.74074074,  0.74074074],
        [ 0.74074074,  0.74074074, -0.37037037]])
 ```
 
-Supported lattice names are stored in the module variable:
+Supported lattice names are stored in the module variables:
 ```
 >>> auguste.names
 ('primitive triclinic', 'primitive monoclinic', 'base-centred monoclinic', 'primitive orthorhombic', 'base-centred orthorhombic', 'body-centred orthorhombic', 'face-centred orthorhombic', 'primitive tetragonal', 'body-centred tetragonal', 'primitive rhombohedral', 'primitive hexagonal', 'primitive cubic', 'body-centred cubic', 'face-centred cubic')
