@@ -24,7 +24,7 @@ SOFTWARE.*/
 #ifndef UNIMODULAR_FUNCTIONS_H
 #define UNIMODULAR_FUNCTIONS_H
 
-#include <cstdint>
+#include <stdint.h>
 
 
 bool unimodular_too_large(int* L);

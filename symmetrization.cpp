@@ -26,7 +26,7 @@ SOFTWARE.*/
 #include <cstring>
 #include <cmath>
 #include <cassert>
-#include <unordered_set>
+#include <set>
 #include <vector>
 #include "mahalonobis_transform.h"
 #include "matrix_vector.h"
@@ -200,7 +200,7 @@ static int _optimize(	char* name,
 	double best_strain = INFINITY;
 	double best_cell[9] = {0};
 	int Lbest[9] = {1, 0, 0, 0, 1, 0, 0, 0, 1};
-	std::unordered_set<uint64_t> visited;
+	std::set<uint64_t> visited;
 
 	int num_neighbours = search_correspondences ? NUM_UNIMODULAR_NEIGHBOURS : 1;
 	int max_it = search_correspondences ? 40 : 1;

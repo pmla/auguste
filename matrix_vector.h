@@ -24,7 +24,7 @@ SOFTWARE.*/
 #ifndef MATRIX_VECTOR_H
 #define MATRIX_VECTOR_H
 
-#include <cstdint>
+#include <stdint.h>
 
 
 void swap(double* a, double* b);

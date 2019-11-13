@@ -22,7 +22,7 @@ SOFTWARE.*/
 
 
 #include <cmath>
-#include <cstdint>
+#include <stdint.h>
 #include <utility>
 
 

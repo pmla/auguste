@@ -21,87 +21,78 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 
-#include <cstring>
-#include <vector>
+#include <map>
+#include <string>
 #include "constants.h"
 
 
-typedef struct
-{
-	const char* name;
-	const int type;
-} dictionary_t;
-
 int parse_string(char* name)
 {
-	std::vector< dictionary_t > lookup = {
+	std::map<std::string, int> lookup;
+	lookup.insert(std::make_pair("triclinic", TRICLINIC));
+	lookup.insert(std::make_pair("primitive triclinic", TRICLINIC));
+	lookup.insert(std::make_pair("aP", TRICLINIC));
 
-		{"triclinic", TRICLINIC},
-		{"primitive triclinic", TRICLINIC},
-		{"aP", TRICLINIC},
+	lookup.insert(std::make_pair("monoclinic", MONOCLINIC));
+	lookup.insert(std::make_pair("primitive monoclinic", MONOCLINIC));
+	lookup.insert(std::make_pair("mP", MONOCLINIC));
 
-		{"monoclinic", MONOCLINIC},
-		{"primitive monoclinic", MONOCLINIC},
-		{"mP", MONOCLINIC},
+	lookup.insert(std::make_pair("base-centred monoclinic", BASEMONOCLINIC));
+	lookup.insert(std::make_pair("base-centered monoclinic", BASEMONOCLINIC));
+	lookup.insert(std::make_pair("mS", BASEMONOCLINIC));
+	lookup.insert(std::make_pair("mC", BASEMONOCLINIC));
 
-		{"base-centred monoclinic", BASEMONOCLINIC},
-		{"base-centered monoclinic", BASEMONOCLINIC},
-		{"mS", BASEMONOCLINIC},
-		{"mC", BASEMONOCLINIC},
+	lookup.insert(std::make_pair("orthorhombic", ORTHORHOMBIC));
+	lookup.insert(std::make_pair("primitive orthorhombic", ORTHORHOMBIC));
+	lookup.insert(std::make_pair("oP", ORTHORHOMBIC));
 
-		{"orthorhombic", ORTHORHOMBIC},
-		{"primitive orthorhombic", ORTHORHOMBIC},
-		{"oP", ORTHORHOMBIC},
+	lookup.insert(std::make_pair("base-centred orthorhombic", BASECO));
+	lookup.insert(std::make_pair("base-centered orthorhombic", BASECO));
+	lookup.insert(std::make_pair("oS", BASECO));
+	lookup.insert(std::make_pair("oC", BASECO));
 
-		{"base-centred orthorhombic", BASECO},
-		{"base-centered orthorhombic", BASECO},
-		{"oS", BASECO},
-		{"oC", BASECO},
+	lookup.insert(std::make_pair("body-centred orthorhombic", BCO));
+	lookup.insert(std::make_pair("body-centered orthorhombic", BCO));
+	lookup.insert(std::make_pair("oF", BCO));
 
-		{"body-centred orthorhombic", BCO},
-		{"body-centered orthorhombic", BCO},
-		{"oF", BCO},
+	lookup.insert(std::make_pair("face-centred orthorhombic", FCO));
+	lookup.insert(std::make_pair("face-centered orthorhombic", FCO));
+	lookup.insert(std::make_pair("oI", FCO));
 
-		{"face-centred orthorhombic", FCO},
-		{"face-centered orthorhombic", FCO},
-		{"oI", FCO},
+	lookup.insert(std::make_pair("tetragonal", TETRAGONAL));
+	lookup.insert(std::make_pair("primitive tetragonal", TETRAGONAL));
+	lookup.insert(std::make_pair("tP", TETRAGONAL));
 
-		{"tetragonal", TETRAGONAL},
-		{"primitive tetragonal", TETRAGONAL},
-		{"tP", TETRAGONAL},
+	lookup.insert(std::make_pair("body-centred tetragonal", BCT));
+	lookup.insert(std::make_pair("body-centered tetragonal", BCT));
+	lookup.insert(std::make_pair("tI", BCT));
 
-		{"body-centred tetragonal", BCT},
-		{"body-centered tetragonal", BCT},
-		{"tI", BCT},
+	lookup.insert(std::make_pair("rhombohedral", RHOMBOHEDRAL));
+	lookup.insert(std::make_pair("primitive rhombohedral", RHOMBOHEDRAL));
+	lookup.insert(std::make_pair("hP", RHOMBOHEDRAL));
 
-		{"rhombohedral", RHOMBOHEDRAL},
-		{"primitive rhombohedral", RHOMBOHEDRAL},
-		{"hP", RHOMBOHEDRAL},
+	lookup.insert(std::make_pair("hexagonal", HEXAGONAL));
+	lookup.insert(std::make_pair("primitive hexagonal", HEXAGONAL));
+	lookup.insert(std::make_pair("hR", HEXAGONAL));
 
-		{"hexagonal", HEXAGONAL},
-		{"primitive hexagonal", HEXAGONAL},
-		{"hR", HEXAGONAL},
+	lookup.insert(std::make_pair("cubic", CUBIC));
+	lookup.insert(std::make_pair("primitive cubic", CUBIC));
+	lookup.insert(std::make_pair("cP", CUBIC));
 
-		{"cubic", CUBIC},
-		{"primitive cubic", CUBIC},
-		{"cP", CUBIC},
+	lookup.insert(std::make_pair("body-centred cubic", BCC));
+	lookup.insert(std::make_pair("body-centered cubic", BCC));
+	lookup.insert(std::make_pair("bcc", BCC));
+	lookup.insert(std::make_pair("cF", BCC));
 
-		{"body-centred cubic", BCC},
-		{"body-centered cubic", BCC},
-		{"bcc", BCC},
-		{"cF", BCC},
+	lookup.insert(std::make_pair("face-centred cubic", FCC));
+	lookup.insert(std::make_pair("face-centered cubic", FCC));
+	lookup.insert(std::make_pair("fcc", FCC));
+	lookup.insert(std::make_pair("cI", FCC));
 
-		{"face-centred cubic", FCC},
-		{"face-centered cubic", FCC},
-		{"fcc", FCC},
-		{"cI", FCC},
-	};
-
-	unsigned int n = strlen(name);
-	for (auto entry : lookup)
-	{
-		if (strlen(entry.name) == n && strncmp(name, entry.name, n) == 0)
-			return entry.type;
+	std::string sname = std::string(name);
+	std::map<std::string, int>::iterator it = lookup.find(sname);
+	if (it != lookup.end()) {
+		return it->second;
 	}
 
 	return -1;
