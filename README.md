@@ -51,4 +51,6 @@ array([0.00000000e+00, 4.28372991e-01, 5.24426159e-16, 4.71404521e-01,
 ```
 
 ### Information
-`auguste` is written by P. M. Larsen.  The software is provided under the MIT license.  A manuscript describing the method is in preparation.
+`auguste` is written by P. M. Larsen.  The software is provided under the MIT license.
+
+Preprint available at https://arxiv.org/abs/1910.03433.
