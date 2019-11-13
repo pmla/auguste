@@ -5,6 +5,7 @@ from distutils.core import setup, Extension
 
 major_version = 0
 minor_version = 1
+subminor_version = 1
 
 python_version = "%d.%d%s" % (sys.version_info.major,
                               sys.version_info.minor,
@@ -32,7 +33,7 @@ module1 = Extension('auguste',
 ])
 
 setup(name = 'auguste',
-       version = '%d.%d' % (major_version, minor_version),
+       version = '%d.%d.%d' % (major_version, minor_version, subminor_version),
        description = 'Minimum-strain Bravais lattice symmetrization',
        author = 'P. M. Larsen',
        author_email = 'pmla@fysik.dtu.dk',
