@@ -210,16 +210,17 @@ static PyMethodDef auguste_methods[] = {
 		"Symmetrize a Bravais lattice.\n\n"
 "Parameters:\n"
 "    lattice_basis: ndarray of shape (3, 3)\n"
-"        Input lattice basis (with rows as basis vectors)\n"
+"        Input lattice basis (with rows as basis vectors).\n"
 "    bravais_type: string\n"
-"        Bravais type to symmetrize to\n"
+"        Bravais type to symmetrize to. Permitted names are stored in\n"
+"        `auguste.names` and `auguste.pearson`.\n"
 "    search_correspondences: bool, optional\n"
-"        Whether to search over lattice correspondences (default is True)\n\n"
+"        Whether to search over lattice correspondences (default is True).\n\n"
 "Returns:\n"
 "    distance: float\n"
-"        Symmetrization distance\n"
+"        Symmetrization distance.\n"
 "    symmetrized: ndarray of shape (3, 3)\n"
-"        Symmetrized cell"
+"        Symmetrized cell."
 	},
 	{
 		"calculate_vector",
@@ -228,10 +229,10 @@ static PyMethodDef auguste_methods[] = {
 "Calculate a vector of distances (strains) from all Bravais lattice types.\n\n"
 "Parameters:\n"
 "    lattice_basis: ndarray of shape (3, 3)\n"
-"        Input lattice basis (with rows as basis vectors)\n\n"
+"        Input lattice basis (with rows as basis vectors).\n\n"
 "Returns:\n"
 "    distances: ndarray of shape (14, )\n"
-"        Symmetrization distance from each of the 14 Bravais types"
+"        Symmetrization distance from each of the 14 Bravais types."
 	},
 	//{
 	//	"minkowski_reduce",
