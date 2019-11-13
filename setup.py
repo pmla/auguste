@@ -32,7 +32,7 @@ module1 = Extension('auguste',
 ])
 
 setup(name = 'auguste',
-       version = '%d.%d' % (minor_version, minor_version),
+       version = '%d.%d' % (major_version, minor_version),
        description = 'Minimum-strain Bravais lattice symmetrization',
        author = 'P. M. Larsen',
        author_email = 'pmla@fysik.dtu.dk',
@@ -41,4 +41,5 @@ setup(name = 'auguste',
 A python module for minimum-strain symmetrization of Bravais lattices.
 The module can compute a distance from each Bravais lattice type, and
 symmetrize an arbitrary lattice to a target Bravais type.''',
-       ext_modules = [module1])
+       ext_modules = [module1]
+)
