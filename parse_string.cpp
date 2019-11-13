@@ -82,11 +82,13 @@ int parse_string(char* name)
 	lookup.insert(std::make_pair("body-centred cubic", BCC));
 	lookup.insert(std::make_pair("body-centered cubic", BCC));
 	lookup.insert(std::make_pair("bcc", BCC));
+	lookup.insert(std::make_pair("BCC", BCC));
 	lookup.insert(std::make_pair("cF", BCC));
 
 	lookup.insert(std::make_pair("face-centred cubic", FCC));
 	lookup.insert(std::make_pair("face-centered cubic", FCC));
 	lookup.insert(std::make_pair("fcc", FCC));
+	lookup.insert(std::make_pair("FCC", FCC));
 	lookup.insert(std::make_pair("cI", FCC));
 
 	std::string sname = std::string(name);
