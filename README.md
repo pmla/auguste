@@ -7,6 +7,11 @@ A python module for minimum-strain symmetrization of Bravais lattices.  Symmetri
 
 To install the module with pip (recommended):
 ```
+pip install --user auguste
+```
+
+To install directly from the git repository:
+```
 pip install --user git+https://github.com/pmla/auguste
 ```
 
