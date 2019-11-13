@@ -25,10 +25,10 @@ To import the module:
 To symmetrize a lattice (with rows as unit vectors):
 ```
 >>> cell = [[0, 1, 1], [1, 0, 1], [1, 1, 0]]
->>> d, symcell = auguste.symmetrize_lattice(cell, "primitive tetragonal")
->>> d
+>>> distance, symmetrized = auguste.symmetrize_lattice(cell, "primitive tetragonal")
+>>> distance
 0.4714045207910317
->>> symcell
+>>> symmetrized
 array([[-0.37037037,  0.74074074,  0.74074074],
        [ 0.74074074, -0.37037037,  0.74074074],
        [ 0.74074074,  0.74074074, -0.37037037]])
@@ -41,7 +41,7 @@ Supported lattice names are stored in the module variables:
 >>> auguste.pearson
 ('aP', 'mP', 'mS', 'oP', 'oS', 'oF', 'oI', 'tP', 'tI', 'hP', 'hR', 'cP', 'cF', 'cI')
 ```
-To calculate the distances from all Bravais types:
+To calculate the symmetrization distances from all Bravais types:
 ```
 >>> auguste.calculate_vector(cell)
 array([0.00000000e+00, 4.28372991e-01, 5.24426159e-16, 4.71404521e-01,
