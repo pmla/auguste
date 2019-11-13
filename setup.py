@@ -36,7 +36,7 @@ setup(name = 'auguste',
        version = '%d.%d' % (minor_version, minor_version),
        description = 'Minimum-strain Bravais lattice symmetrization',
        author = 'P. M. Larsen',
-       author_email = 'pmla@mit.edu',
+       author_email = 'pmla@fysik.dtu.dk',
        url = 'https://github.com/pmla/auguste',
        long_description = '''
 A python module for minimum-strain symmetrization of Bravais lattices.
