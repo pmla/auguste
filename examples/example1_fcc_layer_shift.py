@@ -4,7 +4,8 @@ from auguste import symmetrize_lattice
 
 
 def run():
-
+    """This example creates a FCC crystal and slides the 111 layers over each
+    other. The symmetrization distance is measured in a periodic interval."""
     names = ['fcc', 'bcc', 'rhombohedral', 'hexagonal']
 
     delta = np.array([0, 0, 2]) - [1, 1, 0]
@@ -21,8 +22,12 @@ def run():
     fs = np.array(fs)
     for label, ds in zip(names, fs.T):
         plt.plot(ts, ds, label=label)
+
+    plt.xlabel("Periodic layer shift")
+    plt.ylabel("Symmetrization distance")
     plt.legend()
     plt.show()
+
 
 if __name__ == "__main__":
     run()

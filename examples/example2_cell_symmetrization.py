@@ -33,7 +33,6 @@ def plot_points(cell, ax, c='k'):
 
 
 def run():
-
     cell = np.array([[0.06, 0, 2.01],
                      [3.04, 0, 0],
                      [1.46, 4.72, 0.88]])
@@ -44,14 +43,14 @@ def run():
             ax.axis('off')
             ax.set_aspect('equal', 'datalim')
 
+    maxlen = max([len(name) for name in auguste.names])
     for i, name in enumerate(auguste.names):
-
-        strain, optcell = auguste.symmetrize_lattice(cell, name)
+        distance, optcell = auguste.symmetrize_lattice(cell, name)
         ax = subplots[i // 5][i % 5]
-        ax.set_title("%s\nstrain: %.3f" % (name, strain))
+        ax.set_title("%s\ndistance: %.3f" % (name, distance))
         plot_points(optcell, ax, 'C1')
         plot_points(cell, ax, 'C0')
-        print(name, "%.3f" % strain)
+        print(name.ljust(maxlen + 1), "%.3f" % distance)
     plt.show()
 
 

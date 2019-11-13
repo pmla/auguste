@@ -6,7 +6,6 @@ import auguste
 
 
 def random_vector(n):
-
     while 1:
         l = np.random.uniform(0, 1, n)
         norm = np.linalg.norm(l)
@@ -15,14 +14,12 @@ def random_vector(n):
 
 
 def random_sample(name):
-
     cell = random_vector(9).reshape((3, 3))
     _, cell = auguste.symmetrize_lattice(cell, name)
     return auguste.calculate_vector(cell)
 
 
 def sample_path(name, theta):
-
     s = np.sin(theta)
     c = np.cos(theta)
 
