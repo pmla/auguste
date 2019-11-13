@@ -139,15 +139,15 @@ static PyObject* calculate_vector(PyObject* self, PyObject* args, PyObject* kwar
 	double strains[NUM_TYPES] = {	INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY,
 					INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY, INFINITY};
 
-	char* pearson[NUM_TYPES] = {	"aP", "mP", "mS", "oP", "oS", "oF", "oI",
-					"tP", "tI", "hP", "hR", "cP", "cF", "cI"};
+	const char* pearson[NUM_TYPES] = {	"aP", "mP", "mS", "oP", "oS", "oF", "oI",
+						"tP", "tI", "hP", "hR", "cP", "cF", "cI"};
 
 	for (int i=0;i<NUM_TYPES;i++)
 	{
 		double strain = 0;
 		double dummy_opt[9] = {0};
 
-		int ret = optimize(pearson[i], BT, true, dummy_opt, &strain);
+		int ret = optimize((char*)pearson[i], BT, true, dummy_opt, &strain);
 		if (ret != 0)
 		{
 			if (ret == INVALID_BRAVAIS_TYPE)
