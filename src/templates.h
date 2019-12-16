@@ -169,7 +169,7 @@ const double template_rhombohedral[][3][3] =
 
 const double template_hexagonal[][3][3] =
 {
-	{	{   1,  0.5,    0},
+	{	{   1, -0.5,    0},
 		{   0,sqrt(3)/2,0},
 		{   0,    0,    0},	},
 
