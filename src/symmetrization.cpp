@@ -64,7 +64,7 @@ static void get_key_matrix(double* S, double* key)
 	key[12] =       syx - sxy;  key[13] =       szx + sxz;  key[14] =        syz + szy;  key[15] = -sxx -syy + szz;
 }
 
-static double optimize_lattice_basis(int n, double* x, double* T, double* B, double* opt)
+static double optimize_lattice_basis(int n, double* x, double* T, double* B, double* Q, double* opt)
 {
 	// compute Mahalonobis transform
 	double Ktrans[4 * 9];
@@ -72,7 +72,7 @@ static double optimize_lattice_basis(int n, double* x, double* T, double* B, dou
 
 	// perform stepwise iteration to get a good initial guess
 	// for cubic templates (those with a single template parameter) the initial guess is optimal
-	double Q[9], P[9];
+	double P[9];
 	double tolerance = 1E-5;
 	int max_it = n == 1 ? 1 : 100;	//cubic lattice types need a single iteration only
 	optimize_stepwise(n, x, Ktrans, Q, P, max_it, tolerance);
@@ -128,17 +128,17 @@ static double optimize_lattice_basis(int n, double* x, double* T, double* B, dou
 
 	// calculate optimal scaling factor
 	double s = optimal_scaling_factor(P);
+	for (int i=0;i<9;i++)
+		P[i] *= s;
 
 	// post-multiply strain tensor by B to get symmetrized cell (in original frame)
 	matmul(3, P, B, opt);
-	for (int i=0;i<9;i++)
-		opt[i] *= s;
 
 	// calculate objective function |P - I|_F
 	double obj = 0;
 	for (int i=0;i<9;i++)
 	{
-		double t = s * P[i];
+		double t = P[i];
 		if (i == 0 || i == 4 || i == 8)
 			t -= 1;
 		obj += t * t;
@@ -147,15 +147,9 @@ static double optimize_lattice_basis(int n, double* x, double* T, double* B, dou
 	return sqrt(obj);
 }
 
-static int initialize_lattice_basis(	double* input_B, bool search_correspondences,
-					double* R, int* path, bool* p_flipped)
+static int initialize_lattice_basis(	double* B, bool search_correspondences,
+					double* R, int* path)
 {
-	double B[9];
-	memcpy(B, input_B, 9 * sizeof(double));
-	bool flipped = determinant_3x3(B) < 0;
-	if (flipped)
-		flip_matrix(3, B);
-
 	if (search_correspondences)
 	{
 		int ret = minkowski_basis((double (*)[3])B, (double (*)[3])R, (int (*)[3])path);
@@ -164,16 +158,27 @@ static int initialize_lattice_basis(	double* input_B, bool search_correspondence
 	}
 	else
 	{
+		// set path to identity
+		memset(path, 0, 9 * sizeof(int));
+		path[0] = 1;
+		path[4] = 1;
+		path[8] = 1;
 		memcpy(R, B, 9 * sizeof(double));
 	}
 
-	*p_flipped = flipped;
+	if (determinant_3x3(B) < 0) {
+		flip_matrix(3, R);
+		flip_matrix_i(3, path);
+	}
+
 	return 0;
 }
 
 static int _optimize(	char* name,
-			double* input_B,	//lattice basis in column-vector format
+			double* B,	//lattice basis in column-vector format
 			bool search_correspondences,
+			int* correspondence,
+			double* rotation,
 			double* symmetrized,
 			double* p_strain)
 {
@@ -185,21 +190,20 @@ static int _optimize(	char* name,
 	// triclinic lattice has trivial solution
 	if (type == TRICLINIC)
 	{
-		memcpy(symmetrized, input_B, 9 * sizeof(double));
+		memcpy(symmetrized, B, 9 * sizeof(double));
 		*p_strain = 0;
 		return 0;
 	}
 
-	bool flipped = false;
 	double R[9] = {0};
-	int path[9] = {1, 0, 0, 0, 1, 0, 0, 0, 1};
-	int ret = initialize_lattice_basis(input_B, search_correspondences, R, path, &flipped);
+	int path[9] = {0};
+	int ret = initialize_lattice_basis(B, search_correspondences, R, path);
 	if (ret != 0)
 		return ret;
 
+	int Lbest[9] = {1, 0, 0, 0, 1, 0, 0, 0, 1};
 	double best_strain = INFINITY;
 	double best_cell[9] = {0};
-	int Lbest[9] = {1, 0, 0, 0, 1, 0, 0, 0, 1};
 	std::set<uint64_t> visited;
 
 	int num_neighbours = search_correspondences ? NUM_UNIMODULAR_NEIGHBOURS : 1;
@@ -235,12 +239,13 @@ static int _optimize(	char* name,
 				x[1] = 0;
 			normalize_vector(n, x);
 
-			double opt[9];
-			double strain = optimize_lattice_basis(n, x, A, R, opt);
+			double Q[9], opt[9];
+			double strain = optimize_lattice_basis(n, x, A, R, Q, opt);
 			if (strain < best_strain - 1E-10)
 			{
 				best_strain = strain;
 				memcpy(Lbest, Lcur, 9 * sizeof(int));
+				memcpy(rotation, Q, 9 * sizeof(double));
 				memcpy(best_cell, opt, 9 * sizeof(double));
 				found = true;
 			}
@@ -253,8 +258,10 @@ static int _optimize(	char* name,
 	int Linverse[9] = {0};
 	unimodular_inverse_3x3i(path, Linverse);
 	matmul_di(3, best_cell, Linverse, symmetrized);
-	if (flipped)
-		flip_matrix(3, symmetrized);
+
+	int inverseLbest[9] = {0};
+	unimodular_inverse_3x3i(Lbest, inverseLbest);
+	matmuli(3, path, inverseLbest, correspondence);
 
 	*p_strain = best_strain;
 	return 0;
@@ -265,12 +272,14 @@ extern "C" {
 #endif
 
 int optimize(	char* name,
-		double* input_B,	//lattice basis in column-vector format
+		double* B,	//lattice basis in column-vector format
 		bool search_correspondences,
+		int* correspondence,
+		double* rotation,
 		double* symmetrized,
 		double* p_strain)
 {
-	return _optimize(name, input_B, search_correspondences, symmetrized, p_strain);
+	return _optimize(name, B, search_correspondences, correspondence, rotation, symmetrized, p_strain);
 }
 
 #ifdef __cplusplus

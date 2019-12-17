@@ -42,13 +42,24 @@ static PyObject* error(PyObject* type, const char* msg)
 
 static void transpose(int n, double* A)
 {
-	for (int i=0;i<n;i++)
-		for (int j=i+1;j<n;j++)
-		{
+	for (int i=0;i<n;i++) {
+		for (int j=i+1;j<n;j++) {
 			double temp = A[i * n + j];
 			A[i * n + j] = A[j * n + i];
 			A[j * n + i] = temp;
 		}
+	}
+}
+
+static void transpose_i(int n, int* A)
+{
+	for (int i=0;i<n;i++) {
+		for (int j=i+1;j<n;j++) {
+			int temp = A[i * n + j];
+			A[i * n + j] = A[j * n + i];
+			A[j * n + i] = temp;
+		}
+	}
 }
 
 static bool get_unit_cell(PyObject* obj_B, double* BT)
@@ -88,20 +99,26 @@ static PyObject* symmetrize_lattice(PyObject* self, PyObject* args, PyObject* kw
 	PyObject* obj_B = NULL;
 	char* name = NULL;
 	int search_correspondences = true;
+	int return_correspondence = false;
 
 
 	static const char *kwlist[] = {	(const char*)"lattice_basis",
 					(const char*)"bravais_type",
-					(const char*)"search_correspondences", NULL};
-	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "Os|p", (char**)kwlist, &obj_B, &name, &search_correspondences))
+					(const char*)"search_correspondences",
+					(const char*)"return_correspondence", NULL};
+	if (!PyArg_ParseTupleAndKeywords(args, kwargs, "Os|pp", (char**)kwlist, &obj_B, &name,
+								&search_correspondences,
+								&return_correspondence))
 		return NULL;
 
 	double BT[9] = {0};
 	if (!get_unit_cell(obj_B, BT))
 		return NULL;
 
+	int Lbest[9];
+	double Q[9];
 	double strain = INFINITY, optT[9] = {0};
-	int ret = optimize(name, BT, search_correspondences, optT, &strain);
+	int ret = optimize(name, BT, search_correspondences, Lbest, Q, optT, &strain);
 	if (ret != 0)
 	{
 		if (ret == INVALID_BRAVAIS_TYPE)
@@ -112,12 +129,25 @@ static PyObject* symmetrize_lattice(PyObject* self, PyObject* args, PyObject* kw
 
 	npy_intp dim[2] = {3, 3};
 	PyObject* arr_opt = PyArray_SimpleNew(2, dim, NPY_DOUBLE);
-	double opt[9];
-	memcpy(opt, optT, 9 * sizeof(double));
-	transpose(3, opt);
-	memcpy(PyArray_DATA((PyArrayObject*)arr_opt), opt, 9 * sizeof(double));
+	transpose(3, optT);
+	memcpy(PyArray_DATA((PyArrayObject*)arr_opt), optT, 9 * sizeof(double));
 
-	PyObject* result = Py_BuildValue("dO", strain, arr_opt);
+	PyObject* result = NULL;
+	if (!return_correspondence) {
+		result = Py_BuildValue("dO", strain, arr_opt);
+	}
+	else {
+		PyObject* arr_L = PyArray_SimpleNew(2, dim, NPY_INT);
+		memcpy(PyArray_DATA((PyArrayObject*)arr_L), Lbest, 9 * sizeof(int));
+
+		PyObject* arr_Q = PyArray_SimpleNew(2, dim, NPY_DOUBLE);
+		memcpy(PyArray_DATA((PyArrayObject*)arr_Q), Q, 9 * sizeof(double));
+
+		result = Py_BuildValue("dOOO", strain, arr_opt, arr_Q, arr_L);
+		Py_DECREF(arr_Q);
+		Py_DECREF(arr_L);
+	}
+
 	Py_DECREF(arr_opt);
 	return result;
 }
@@ -145,9 +175,10 @@ static PyObject* calculate_vector(PyObject* self, PyObject* args, PyObject* kwar
 	for (int i=0;i<NUM_TYPES;i++)
 	{
 		double strain = 0;
-		double dummy_opt[9] = {0};
+		double dummy_opt[9] = {0}, dummy_Q[9] = {0};
+		int dummy_L[9];
 
-		int ret = optimize((char*)pearson[i], BT, true, dummy_opt, &strain);
+		int ret = optimize((char*)pearson[i], BT, true, dummy_L, dummy_Q, dummy_opt, &strain);
 		if (ret != 0)
 		{
 			if (ret == INVALID_BRAVAIS_TYPE)
@@ -165,7 +196,6 @@ static PyObject* calculate_vector(PyObject* self, PyObject* args, PyObject* kwar
 	return arr_strains;
 }
 
-/*
 static PyObject* minkowski_reduce(PyObject* self, PyObject* args)
 {
 	(void)self;
@@ -185,9 +215,11 @@ static PyObject* minkowski_reduce(PyObject* self, PyObject* args)
 
 	npy_intp dim[2] = {3, 3};
 	PyObject* arr_R = PyArray_SimpleNew(2, dim, NPY_DOUBLE);
+	transpose(3, R);
 	memcpy(PyArray_DATA((PyArrayObject*)arr_R), R, 9 * sizeof(double));
 
 	PyObject* arr_path = PyArray_SimpleNew(2, dim, NPY_INT);
+	transpose_i(3, path);
 	memcpy(PyArray_DATA((PyArrayObject*)arr_path), path, 9 * sizeof(int));
 
 	PyObject* result = NULL;
@@ -200,7 +232,6 @@ static PyObject* minkowski_reduce(PyObject* self, PyObject* args)
 	Py_DECREF(arr_path);
 	return result;
 }
-*/
 
 static PyMethodDef auguste_methods[] = {
 	{
@@ -234,12 +265,12 @@ static PyMethodDef auguste_methods[] = {
 "    distances: ndarray of shape (14, )\n"
 "        Symmetrization distance from each of the 14 Bravais types."
 	},
-	//{
-	//	"minkowski_reduce",
-	//	minkowski_reduce,
-	//	METH_VARARGS,
-	//	"Minkowski-reduce a Bravais lattice basis."
-	//},
+	{
+		"minkowski_reduce",
+		minkowski_reduce,
+		METH_VARARGS,
+		"Minkowski-reduce a Bravais lattice basis."
+	},
 	{NULL, NULL, 0, NULL}
 };
 

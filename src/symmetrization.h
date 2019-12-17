@@ -29,8 +29,10 @@ extern "C" {
 #endif
 
 int optimize(	char* name,
-		double* input_B,	//lattice basis in column-vector format
+		double* B,	//lattice basis in column-vector format
 		bool search_correspondences,
+		int* correspondence,
+		double* rotation,
 		double* symmetrized,
 		double* p_strain);
 

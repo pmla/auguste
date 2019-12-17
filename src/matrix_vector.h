@@ -44,6 +44,7 @@ void matmul_id(int n, int* A, double* x, double* b);
 double determinant_3x3(double* m);
 void unimodular_inverse_3x3i(int* A, int* B);
 void flip_matrix(int n, double* m);
+void flip_matrix_i(int n, int* m);
 
 #endif
 
