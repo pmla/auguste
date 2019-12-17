@@ -49,4 +49,6 @@ setup(name = 'auguste',
       url = 'https://github.com/pmla/auguste',
       long_description_content_type='text/markdown',
       long_description=long_description,
+      install_requires=['numpy',
+                        'scipy'],
 )
