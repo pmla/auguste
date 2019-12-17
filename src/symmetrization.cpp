@@ -190,6 +190,18 @@ static int _optimize(	char* name,
 	// triclinic lattice has trivial solution
 	if (type == TRICLINIC)
 	{
+		// set correspondence to identity
+		memset(correspondence, 0, 9 * sizeof(int));
+		correspondence[0] = 1;
+		correspondence[4] = 1;
+		correspondence[8] = 1;
+
+		// set rotation to identity
+		memset(rotation, 0, 9 * sizeof(double));
+		rotation[0] = 1;
+		rotation[4] = 1;
+		rotation[8] = 1;
+
 		memcpy(symmetrized, B, 9 * sizeof(double));
 		*p_strain = 0;
 		return 0;
