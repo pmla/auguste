@@ -40,6 +40,7 @@ module = Extension('auguste',
 ])
 
 setup(name = 'auguste',
+      python_requires='>=3.5.0',
       ext_modules = [module],
       version = '%d.%d.%d' % (major_version, minor_version, subminor_version),
       description = 'Minimum-strain symmetrization of Bravais lattices',
