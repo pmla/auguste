@@ -2,7 +2,7 @@ jobs:
   include:
     - language: python
       python:
-        - "3.4"
+        - "3.5"
         - "3.6"      # current default Python on Travis CI
       # command to install dependencies
       install:
