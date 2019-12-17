@@ -6,7 +6,7 @@ jobs:
         - "3.6"      # current default Python on Travis CI
       # command to install dependencies
       install:
-        - pip install git+https://github.com/pmla/auguste@development
+        - pip install git+https://github.com/pmla/auguste@two-dimensional
       # command to run tests
       script:
         - pytest tests/*
@@ -35,7 +35,7 @@ jobs:
         - python3 -m pip install --upgrade pytest
       # command to install dependencies
       install:
-        - python3 -m pip install git+https://github.com/pmla/auguste@development
+        - python3 -m pip install git+https://github.com/pmla/auguste@two-dimensional
       # command to run tests
       script:
         - python3 -m pytest tests/*
