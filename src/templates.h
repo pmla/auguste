@@ -49,12 +49,12 @@ const double template_monoclinic[][3][3] =
 
 const double template_basemonoclinic[][3][3] =
 {
-	{	{ 0.5,    0,    0},
+	{	{ 0.5, -0.5,    0},
 		{   0,    0,    0},
 		{   0,    0,    0},	},
 
 	{	{   0,    0,    0},
-		{ 0.5,    1,    0},
+		{ 0.5,  0.5,    0},
 		{   0,    0,    0},	},
 
 	{	{   0,    0,    0},
