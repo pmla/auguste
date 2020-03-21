@@ -2,14 +2,14 @@ jobs:
   include:
     - language: python
       python:
-        - "3.4"
         - "3.6"      # current default Python on Travis CI
       # command to install dependencies
       install:
-        - pip install git+https://github.com/pmla/auguste
+        - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+        - python3 -m pip install git+https://github.com/pmla/auguste@$BRANCH
       # command to run tests
       script:
-        - pytest tests/*
+        - python3 -m pytest tests/*
 
     - language: sh
       os: osx
@@ -35,7 +35,8 @@ jobs:
         - python3 -m pip install --upgrade pytest
       # command to install dependencies
       install:
-        - python3 -m pip install git+https://github.com/pmla/auguste
+        - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+        - python3 -m pip install git+https://github.com/pmla/auguste@$BRANCH
       # command to run tests
       script:
         - python3 -m pytest tests/*

@@ -5,7 +5,7 @@ from setuptools import setup, Extension
 
 major_version = 0
 minor_version = 1
-subminor_version = 2
+subminor_version = 3
 
 python_version = "%d.%d%s" % (sys.version_info.major,
                               sys.version_info.minor,
@@ -24,22 +24,23 @@ module = Extension('auguste',
                    include_dirs = [os.path.join(numpy.get_include(), 'numpy')],
                    libraries = [],
                    library_dirs = [],
-                   sources = ['eigendecomposition.cpp',
-                              'lup_decomposition.cpp',
-                              'mahalonobis_transform.cpp',
-                              'matrix_vector.cpp',
-                              'minkowski_reduction.cpp',
-                              'parse_string.cpp',
-                              'polar_decomposition.cpp',
-                              'quaternion.cpp',
-                              'sqp_newton_lagrange.cpp',
-                              'stepwise_iteration.cpp',
-                              'symmetrization.cpp',
-                              'unimodular_functions.cpp',
-                              'auguste_module.cpp',
+                   sources = ['src/eigendecomposition.cpp',
+                              'src/lup_decomposition.cpp',
+                              'src/mahalonobis_transform.cpp',
+                              'src/matrix_vector.cpp',
+                              'src/minkowski_reduction.cpp',
+                              'src/parse_string.cpp',
+                              'src/polar_decomposition.cpp',
+                              'src/quaternion.cpp',
+                              'src/sqp_newton_lagrange.cpp',
+                              'src/stepwise_iteration.cpp',
+                              'src/symmetrization.cpp',
+                              'src/unimodular_functions.cpp',
+                              'src/auguste_module.cpp',
 ])
 
 setup(name = 'auguste',
+      python_requires='>=3.5.0',
       ext_modules = [module],
       version = '%d.%d.%d' % (major_version, minor_version, subminor_version),
       description = 'Minimum-strain symmetrization of Bravais lattices',
@@ -48,4 +49,6 @@ setup(name = 'auguste',
       url = 'https://github.com/pmla/auguste',
       long_description_content_type='text/markdown',
       long_description=long_description,
+      install_requires=['numpy',
+                        'scipy'],
 )

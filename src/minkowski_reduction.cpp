@@ -33,6 +33,8 @@ SOFTWARE.*/
 #include "matrix_vector.h"
 
 
+#define SIGN(x) ((x > 0 ? 1 : -1))
+
 static int gauss(double (*BT)[3], int* hu, int *hv)
 {
 	double u[3], v[3];
@@ -188,6 +190,7 @@ static int _minkowski_basis(double (*BT)[3], double (*reduced_basis)[3], int (*o
 	int path[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
 	double norms[3];
 	column_norms(BT, norms);
+	int sign0 = SIGN(determinant_3x3(BT[0]));
 
 
 	const int max_it = 10000;	//in practice this is not exceeded
@@ -239,7 +242,7 @@ static int _minkowski_basis(double (*BT)[3], double (*reduced_basis)[3], int (*o
 
 		if (norms[2] >= norms[1] or (nb[0] == 0 && nb[1] == 0 && nb[2] == 0))
 		{
-			if (determinant_3x3(Bprime[0]) < 0)
+			if (SIGN(determinant_3x3(Bprime[0])) != sign0)
 			{
 				for (int i=0;i<3;i++)
 					for (int j=0;j<3;j++)

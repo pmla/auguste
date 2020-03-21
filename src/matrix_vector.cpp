@@ -179,8 +179,21 @@ double determinant_3x3(double* m)
 		+ m[2] * (m[3] * m[7] - m[4] * m[6]);
 }
 
+int determinant_3x3_i(int* m)
+{
+	/*	0 1 2
+		3 4 5
+		6 7 8	*/
+
+	return    m[0] * (m[4] * m[8] - m[5] * m[7])
+		- m[1] * (m[3] * m[8] - m[5] * m[6])
+		+ m[2] * (m[3] * m[7] - m[4] * m[6]);
+}
+
 void unimodular_inverse_3x3i(int* A, int* B)
 {
+	int sign = determinant_3x3_i(A);
+
 	int a11 = A[0];
 	int a12 = A[1];
 	int a13 = A[2];
@@ -204,6 +217,10 @@ void unimodular_inverse_3x3i(int* A, int* B)
 	B[6] = a21 * a32 - a22 * a31;
 	B[7] = a12 * a31 - a11 * a32;
 	B[8] = a11 * a22 - a12 * a21;
+
+	for (int i=0;i<9;i++) {
+		B[i] *= sign;
+	}
 }
 
 void flip_matrix(int n, double* m)
@@ -212,3 +229,8 @@ void flip_matrix(int n, double* m)
 		m[i] = -m[i];
 }
 
+void flip_matrix_i(int n, int* m)
+{
+	for (int i=0;i<n*n;i++)
+		m[i] = -m[i];
+}
