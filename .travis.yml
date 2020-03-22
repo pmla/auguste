@@ -5,7 +5,7 @@ jobs:
         - "3.6"      # current default Python on Travis CI
       # command to install dependencies
       install:
-        - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+        - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
         - python3 -m pip install git+https://github.com/pmla/auguste@$BRANCH
       # command to run tests
       script:
@@ -35,7 +35,7 @@ jobs:
         - python3 -m pip install --upgrade pytest
       # command to install dependencies
       install:
-        - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+        - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
         - python3 -m pip install git+https://github.com/pmla/auguste@$BRANCH
       # command to run tests
       script:

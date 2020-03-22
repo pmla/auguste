@@ -56,6 +56,10 @@ array([0.00000000e+00, 4.28372991e-01, 5.24426159e-16, 4.71404521e-01,
 ```
 
 ### Information
-`auguste` is written by P. M. Larsen.  The software is provided under the MIT license.
+If you use auguste in a publication, please cite:
+
+Peter M. Larsen, Edward L. Pang, Pablo A. Parrilo, and Karsten W. Jacobsen; "Minimum-strain symmetrization of Bravais lattices"; Phys. Rev. Research 2, 013077
+
+Article available at https://doi.org/10.1103/PhysRevResearch.2.013077
 
 Preprint available at https://arxiv.org/abs/1910.03433.
