@@ -97,7 +97,7 @@ static int closest_vector(double* t0, double* u, double* v, int* _a)
 		{
 			double dx = vs[i][0] + t[0];
 			double dy = vs[i][1] + t[1];
-			double d = dx * dx + dy * dy;
+			double d = sqrt(dx * dx + dy * dy);
 			if (d < best)
 			{
 				best = d;

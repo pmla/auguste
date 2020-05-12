@@ -123,6 +123,8 @@ static PyObject* symmetrize_lattice(PyObject* self, PyObject* args, PyObject* kw
 	{
 		if (ret == INVALID_BRAVAIS_TYPE)
 			return error(PyExc_TypeError, "unrecognized bravais_type");
+		else if (ret == MINKOWSKI_REDUCTION_FAILURE)
+			return error(PyExc_TypeError, "Minkowski reduction failed");
 		else
 			return error(PyExc_TypeError, "symmetrization failed");
 	}
@@ -181,10 +183,12 @@ static PyObject* calculate_vector(PyObject* self, PyObject* args, PyObject* kwar
 		int ret = optimize((char*)pearson[i], BT, true, dummy_L, dummy_Q, dummy_opt, &strain);
 		if (ret != 0)
 		{
-			if (ret == INVALID_BRAVAIS_TYPE)
-				return error(PyExc_TypeError, "unrecognized bravais_type");
-			else
-				return error(PyExc_TypeError, "symmetrization failed");
+		    if (ret == INVALID_BRAVAIS_TYPE)
+			    return error(PyExc_TypeError, "unrecognized bravais_type");
+		    else if (ret == MINKOWSKI_REDUCTION_FAILURE)
+			    return error(PyExc_TypeError, "Minkowski reduction failed");
+		    else
+			    return error(PyExc_TypeError, "symmetrization failed");
 		}
 
 		strains[i] = strain;
