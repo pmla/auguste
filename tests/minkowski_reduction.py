@@ -17,3 +17,12 @@ def test_random_3D(seed):
 
     norms = np.linalg.norm(R, axis=1)
     assert (np.argsort(norms) == range(3)).all()
+
+
+# Issue 4
+def test_similar_norms():
+
+    cell = np.array([[-5.35538034, -0.1350599, -5.2795042],
+                     [ 5.35538034, -5.2795042, -0.1350599],
+                     [-5.35538034, -5.2795042, -0.1350599]])
+    R, H = minkowski_reduce(cell)
