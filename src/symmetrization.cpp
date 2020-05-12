@@ -154,7 +154,7 @@ static int initialize_lattice_basis(	double* B, bool search_correspondences,
 	{
 		int ret = minkowski_basis((double (*)[3])B, (double (*)[3])R, (int (*)[3])path);
 		if (ret != 0)
-			return -1;
+			return MINKOWSKI_REDUCTION_FAILURE;
 	}
 	else
 	{
