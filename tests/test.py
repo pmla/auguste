@@ -49,7 +49,7 @@ def test_strain(name, cell, seed):
 def test_correspondence(name, cell, seed):
 
     rng = np.random.RandomState(seed=seed)
-    q = Rotation.random(random_state=rng).as_dcm()
+    q = Rotation.random(random_state=rng).as_matrix()
 
     inputL = np.array([[1, 2, 3], [0, 1, 0], [0, 0, 1]])
     assert np.linalg.det(inputL) == 1
