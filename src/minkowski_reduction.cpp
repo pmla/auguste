@@ -35,6 +35,52 @@ SOFTWARE.*/
 
 #define SIGN(x) ((x > 0 ? 1 : -1))
 
+const int max_it = 10000;	//in practice this is not exceeded
+
+
+class CycleChecker
+{
+public:
+    CycleChecker(int d) {
+        visited = data;
+        if (d == 2) {
+            max_cycle_length = (6 * 5) * (2 * 1);
+            size = 6;
+        }
+        else if (d == 3) {
+            max_cycle_length = (12 * 11 * 10) * (3 * 2 * 1);
+            size = 9;
+        }
+
+        memset(visited, 0, max_cycle_length * sizeof(int));
+    }
+
+    bool add_site(int* path) {
+        bool found = false;
+        for (int i=0;i<max_cycle_length;i++) {
+            if (memcmp(path, &visited[i * size], size * sizeof(int)) == 0) {
+                found = true;
+                break;
+            }
+        }
+
+        // shift all visited sites down and place current site at the top
+        for (int i=0;i<max_cycle_length - 1;i++) {
+            memcpy(&visited[(i + 1) * size], &visited[i * size], size * sizeof(int));
+        }
+
+        memcpy(&visited[0], path, size * sizeof(int));
+        return found;
+    }
+
+
+private:
+    static const int nmax = 12 * 11 * 10 * 6;
+    int max_cycle_length;
+    int size;
+    int data[nmax * 9];
+    int* visited;
+};
 
 static double round_even(double x)
 {
@@ -56,12 +102,12 @@ static double round_even(double x)
 
 static int gauss(double (*BT)[3], int* hu, int *hv)
 {
+    CycleChecker cycle_checker = CycleChecker(2);
 	double u[3], v[3];
 	matveci(3, (double*)BT, hu, u);
 	matveci(3, (double*)BT, hv, v);
 
 	int temp[3];
-	const int max_it = 10000;	//in practice this is not exceeded
 	for (int it=0;it<max_it;it++)
 	{
 		int x = (int)round_even(vector_dot(3, u, v) / vector_dot(3, u, u));
@@ -74,7 +120,8 @@ static int gauss(double (*BT)[3], int* hu, int *hv)
 		matveci(3, (double*)BT, hu, u);
 		matveci(3, (double*)BT, hv, v);
 
-		if (vector_dot(3, u, u) >= vector_dot(3, v, v))
+        int path[6] = {hu[0], hu[1], hu[2], hv[0], hv[1], hv[2]};
+		if (vector_dot(3, u, u) >= vector_dot(3, v, v) or cycle_checker.add_site(path))
 		{
 			memcpy(temp, hv, 3 * sizeof(int));
 			memcpy(hv, hu, 3 * sizeof(int));
@@ -105,7 +152,6 @@ static int closest_vector(double* t0, double* u, double* v, int* _a)
 
 	int a[2] = {0, 0};
 	double dprev = INFINITY;
-	const int max_it = 10000;	//in practice this is not exceeded
 	for (int it=0;it<max_it;it++)
 	{
 		int index = 0;
@@ -211,7 +257,8 @@ static int _minkowski_basis(double (*BT)[3], double (*reduced_basis)[3], int (*o
 	column_norms(BT, norms);
 	int sign0 = SIGN(determinant_3x3(BT[0]));
 
-	const int max_it = 10000;	//in practice this is not exceeded
+    CycleChecker cycle_checker = CycleChecker(3);
+
 	for (int it=0;it<max_it;it++)
 	{
 		order_path_by_norms(norms, path);
@@ -257,7 +304,7 @@ static int _minkowski_basis(double (*BT)[3], double (*reduced_basis)[3], int (*o
 		norms[1] = vector_norm(3, Bprime[1]);
 		norms[2] = vector_norm(3, Bprime[2]);
 
-		if (norms[2] >= norms[1] or (nb[0] == 0 && nb[1] == 0))
+		if (norms[2] >= norms[1] or cycle_checker.add_site((int*)path))
 		{
 			if (SIGN(determinant_3x3(Bprime[0])) != sign0)
 			{
