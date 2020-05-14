@@ -10,7 +10,7 @@ import platform
 major_version = 0
 minor_version = 1
 subminor_version = 5
-version = '%d.%d.%d' % (major_version, minor_version, subminor_version)
+version = f'{major_version}.{minor_version}.{subminor_version}'
 extra_compile_args = []
 
 
@@ -65,7 +65,7 @@ module = Extension(
 )
 
 setup(name='auguste',
-      python_requires='>=3.5.0',
+      python_requires='>=3.6',
       ext_modules=[module],
       version=version,
       description='Minimum-strain symmetrization of Bravais lattices',
