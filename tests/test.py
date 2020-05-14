@@ -13,11 +13,19 @@ TOL = 1E-10
 input_data = {"primitive cubic": np.eye(3),
               "primitive tetragonal": np.diag([1, 1, 2]),
               "primitive orthorhombic": np.diag([1, 2, 3]),
-              "primitive hexagonal": np.array([[1, 0, 0], [-1/2, np.sqrt(3) / 2, 0], [0, 0, 1]]),
-              "face-centred cubic": np.array([[1, 1, 0], [1, 0, 1], [0, 1, 1]]),
-              "body-centred cubic": np.array([[1, 1, -1], [1, -1, 1], [-1, 1, 1]]),
-              "base-centred orthorhombic": np.array([[2, 1, 0], [2, -1, 0], [0, 0, 4]])
-             }
+              "primitive hexagonal": np.array([[1, 0, 0],
+                                               [-1/2, np.sqrt(3) / 2, 0],
+                                               [0, 0, 1]]),
+              "face-centred cubic": np.array([[1, 1, 0],
+                                              [1, 0, 1],
+                                              [0, 1, 1]]),
+              "body-centred cubic": np.array([[1, 1, -1],
+                                              [1, -1, 1],
+                                              [-1, 1, 1]]),
+              "base-centred orthorhombic": np.array([[2, 1, 0],
+                                                     [2, -1, 0],
+                                                     [0, 0, 4]])
+              }
 
 simple = ["primitive cubic",
           "primitive tetragonal",
