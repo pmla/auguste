@@ -10,6 +10,7 @@ import platform
 major_version = 0
 minor_version = 1
 subminor_version = 5
+version = '%d.%d.%d' % (major_version, minor_version, subminor_version)
 
 python_version = "%d.%d%s" % (sys.version_info.major,
                               sys.version_info.minor,
@@ -46,32 +47,31 @@ this_directory = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-
-module = Extension('augustecpp',
-                   sources=['src/eigendecomposition.cpp',
-                            'src/lup_decomposition.cpp',
-                            'src/mahalonobis_transform.cpp',
-                            'src/matrix_vector.cpp',
-                            'src/minkowski_reduction.cpp',
-                            'src/parse_string.cpp',
-                            'src/polar_decomposition.cpp',
-                            'src/quaternion.cpp',
-                            'src/sqp_newton_lagrange.cpp',
-                            'src/stepwise_iteration.cpp',
-                            'src/symmetrization.cpp',
-                            'src/unimodular_functions.cpp',
-                            'src/auguste_module.cpp',
-                            ],
-                   include_dirs=[os.path.join(numpy.get_include(), 'numpy'),
-                                 'src'],
-                   extra_compile_args=extra_compile_args,
-                   language='c++'
+module = Extension(
+    'auguste',
+    sources=['src/eigendecomposition.cpp',
+             'src/lup_decomposition.cpp',
+             'src/mahalonobis_transform.cpp',
+             'src/matrix_vector.cpp',
+             'src/minkowski_reduction.cpp',
+             'src/parse_string.cpp',
+             'src/polar_decomposition.cpp',
+             'src/quaternion.cpp',
+             'src/sqp_newton_lagrange.cpp',
+             'src/stepwise_iteration.cpp',
+             'src/symmetrization.cpp',
+             'src/unimodular_functions.cpp',
+             'src/auguste_module.cpp'],
+    include_dirs=[os.path.join(numpy.get_include(), 'numpy'),
+                  'src'],
+    extra_compile_args=extra_compile_args,
+    language='c++'
 )
 
 setup(name='auguste',
       python_requires='>=3.5.0',
       ext_modules=[module],
-      version='%d.%d.%d' % (major_version, minor_version, subminor_version),
+      version=version,
       description='Minimum-strain symmetrization of Bravais lattices',
       author='P. M. Larsen',
       author_email='peter.mahler.larsen@gmail.com',
