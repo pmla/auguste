@@ -11,10 +11,6 @@ major_version = 0
 minor_version = 1
 subminor_version = 5
 version = '%d.%d.%d' % (major_version, minor_version, subminor_version)
-
-python_version = "%d.%d%s" % (sys.version_info.major,
-                              sys.version_info.minor,
-                              sys.abiflags)
 extra_compile_args = []
 
 
