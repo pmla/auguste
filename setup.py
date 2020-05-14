@@ -9,7 +9,7 @@ import platform
 
 major_version = 0
 minor_version = 1
-subminor_version = 3
+subminor_version = 4
 
 python_version = "%d.%d%s" % (sys.version_info.major,
                               sys.version_info.minor,
