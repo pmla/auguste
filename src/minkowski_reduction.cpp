@@ -35,6 +35,25 @@ SOFTWARE.*/
 
 #define SIGN(x) ((x > 0 ? 1 : -1))
 
+
+static double round_even(double x)
+{
+    double rounded = round(x);
+    double remainder = x - rounded;
+    if (fabs(remainder) != 0.5)
+        return rounded;
+
+    int i = (int)rounded;
+    bool odd = abs(i % 2) == 1;
+    if (!odd)
+        return rounded;
+
+    if (x >= 0)
+        return rounded - 1;
+    else
+        return rounded + 1;
+}
+
 static int gauss(double (*BT)[3], int* hu, int *hv)
 {
 	double u[3], v[3];
@@ -45,7 +64,7 @@ static int gauss(double (*BT)[3], int* hu, int *hv)
 	const int max_it = 10000;	//in practice this is not exceeded
 	for (int it=0;it<max_it;it++)
 	{
-		int x = (int)round(vector_dot(3, u, v) / vector_dot(3, u, u));
+		int x = (int)round_even(vector_dot(3, u, v) / vector_dot(3, u, u));
 
 		memcpy(temp, hu, 3 * sizeof(int));
 		for (int i=0;i<3;i++)
@@ -113,7 +132,7 @@ static int closest_vector(double* t0, double* u, double* v, int* _a)
 		}
 
 		dprev = best;
-		int kopt = (int)round(-vector_dot(2, t, vs[index]) / vector_dot(2, vs[index], vs[index]));
+		int kopt = (int)round_even(-vector_dot(2, t, vs[index]) / vector_dot(2, vs[index], vs[index]));
 		a[0] += kopt * cs[index][0];
 		a[1] += kopt * cs[index][1];
 
@@ -192,12 +211,10 @@ static int _minkowski_basis(double (*BT)[3], double (*reduced_basis)[3], int (*o
 	column_norms(BT, norms);
 	int sign0 = SIGN(determinant_3x3(BT[0]));
 
-
 	const int max_it = 10000;	//in practice this is not exceeded
 	for (int it=0;it<max_it;it++)
 	{
 		order_path_by_norms(norms, path);
-
 		ret = gauss(BT, path[0], path[1]);
 		if (ret != 0)
 			return ret;
@@ -221,7 +238,7 @@ static int _minkowski_basis(double (*BT)[3], double (*reduced_basis)[3], int (*o
 		pv[1] = temp[1];
 		pw[1] = temp[2];
 
-		int nb[3] = {0, 0, 0};
+		int nb[2] = {0, 0};
 		ret = closest_vector(pw, pu, pv, nb);
 		if (ret != 0)
 			return ret;
@@ -240,7 +257,7 @@ static int _minkowski_basis(double (*BT)[3], double (*reduced_basis)[3], int (*o
 		norms[1] = vector_norm(3, Bprime[1]);
 		norms[2] = vector_norm(3, Bprime[2]);
 
-		if (norms[2] >= norms[1] or (nb[0] == 0 && nb[1] == 0 && nb[2] == 0))
+		if (norms[2] >= norms[1] or (nb[0] == 0 && nb[1] == 0))
 		{
 			if (SIGN(determinant_3x3(Bprime[0])) != sign0)
 			{
