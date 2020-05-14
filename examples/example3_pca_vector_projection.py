@@ -7,10 +7,10 @@ import auguste
 
 def random_vector(n):
     while 1:
-        l = np.random.uniform(0, 1, n)
-        norm = np.linalg.norm(l)
+        v = np.random.uniform(0, 1, n)
+        norm = np.linalg.norm(v)
         if norm < 1:
-            return l / norm
+            return v / norm
 
 
 def random_sample(name):

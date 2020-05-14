@@ -10,11 +10,7 @@ import platform
 major_version = 0
 minor_version = 1
 subminor_version = 5
-version = '%d.%d.%d' % (major_version, minor_version, subminor_version)
-
-python_version = "%d.%d%s" % (sys.version_info.major,
-                              sys.version_info.minor,
-                              sys.abiflags)
+version = f'{major_version}.{minor_version}.{subminor_version}'
 extra_compile_args = []
 
 
@@ -69,15 +65,14 @@ module = Extension(
 )
 
 setup(name='auguste',
-      python_requires='>=3.5.0',
+      python_requires='>=3.6',
       ext_modules=[module],
       version=version,
       description='Minimum-strain symmetrization of Bravais lattices',
-      author='P. M. Larsen',
+      author='Peter M. Larsen',
       author_email='peter.mahler.larsen@gmail.com',
       url='https://github.com/pmla/auguste',
       long_description_content_type='text/markdown',
       long_description=long_description,
-      install_requires=['numpy', 'scipy'],
-      packages=find_packages(),
-)
+      install_requires=['numpy'],
+      packages=find_packages())
