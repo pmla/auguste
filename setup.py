@@ -1,7 +1,7 @@
 import os
 import sys
 import numpy
-from setuptools import setup, Extension
+from setuptools import Extension, find_packages, setup
 from distutils.sysconfig import get_config_vars
 from distutils.version import LooseVersion
 import platform
@@ -47,13 +47,7 @@ with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 
-module = Extension('auguste',
-                   define_macros=[('MAJOR_VERSION', str(major_version)),
-                                  ('MINOR_VERSION', str(minor_version))],
-                   include_dirs=[os.path.join(numpy.get_include(), 'numpy')],
-                   libraries=[],
-                   library_dirs=[],
-                   extra_compile_args=extra_compile_args,
+module = Extension('augustecpp',
                    sources=['src/eigendecomposition.cpp',
                             'src/lup_decomposition.cpp',
                             'src/mahalonobis_transform.cpp',
@@ -67,7 +61,12 @@ module = Extension('auguste',
                             'src/symmetrization.cpp',
                             'src/unimodular_functions.cpp',
                             'src/auguste_module.cpp',
-                            ])
+                            ],
+                   include_dirs=[os.path.join(numpy.get_include(), 'numpy'),
+                                 'src'],
+                   extra_compile_args=extra_compile_args,
+                   language='c++'
+)
 
 setup(name='auguste',
       python_requires='>=3.5.0',
@@ -80,4 +79,5 @@ setup(name='auguste',
       long_description_content_type='text/markdown',
       long_description=long_description,
       install_requires=['numpy', 'scipy'],
+      packages=find_packages(),
 )
