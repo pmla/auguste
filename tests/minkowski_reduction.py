@@ -23,6 +23,14 @@ def test_random_3D(seed):
 def test_similar_norms():
 
     cell = np.array([[-5.35538034, -0.1350599, -5.2795042],
-                     [ 5.35538034, -5.2795042, -0.1350599],
+                     [+5.35538034, -5.2795042, -0.1350599],
                      [-5.35538034, -5.2795042, -0.1350599]])
-    R, H = minkowski_reduce(cell)
+    minkowski_reduce(cell)
+
+
+# Also issue 4
+def test_cycle():
+    cell = np.array([[-4.1855226, 4.17604824, 0.02341527],
+                     [+4.1855226, 0.02341527, 4.17604824],
+                     [+4.1855226, 4.17604824, 0.02341527]])
+    minkowski_reduce(cell)
